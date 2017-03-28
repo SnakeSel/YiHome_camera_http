@@ -3,10 +3,10 @@
       <tbody>
         <tr>
               <td class="tablenone">
-                <form action="/cmd.cgi/"><button type="submit" name="cmd" value="reboot">Перезагрузка</button></form>
+                <form action="/cmd.cgi/" method="post"><button type="submit" name="cmd" value="reboot">Перезагрузка</button></form>
               </td>
               <td class="tablenone">
-                <form action="/cmd.cgi/"><button type="submit" name="cmd" value="off">Выключение</button></form>
+                <form action="/cmd.cgi/" method="post"><button type="submit" name="cmd" value="off">Выключение</button></form>
               </td>
         </tr>
       </tbody>
@@ -14,7 +14,7 @@
 
     <hr />
     <footer>
-        <p style="text-align: center;">&copy; SnakeSel для <a href="http://4pda.ru/forum/index.php?showtopic=638230" target="_blank">4pda</a>.<br><sub>version 20170128</sub></p>
+        <p style="text-align: center;">&copy; SnakeSel для <a href="http://4pda.ru/forum/index.php?showtopic=638230" target="_blank">4pda</a>.<br><sub>version 20170328</sub></p>
     </footer>
   </body>
 </html>

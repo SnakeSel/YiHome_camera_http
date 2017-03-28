@@ -4,6 +4,8 @@
 # Переменные
 ########################################
 
+cmdurl=/cmd.cgi/
+
 # Подсчет TZ
 carrentTZ=$(cat /etc/TZ | sed 's/GMT//')
 _tz=$((8-carrentTZ))
@@ -29,7 +31,7 @@ _date=$(date +%Y%m%d)
 ########################################
 cat header
 cat << EOF
-    <form action="/cmd.cgi/">
+    <form action="$cmdurl" method="post">
       <p><h3>Часовой пояс</h3></p>
       <p>Текущее время: $(date)</p>
       <p>Часовой пояс:</p>
@@ -43,7 +45,7 @@ cat << EOF
       <tbody>
 	<tr>
 	  <td>
-		<form action="/cmd.cgi/">
+		<form action="$cmdurl" method="post">
       			<p><h3>FTP</h3></p>
       			<p><input type="radio"  $_ftpon name="ftp" value="on" />Включен</p>
       			<p><input type="radio"  $_ftpoff name="ftp" value="off" />Выключен</p>
@@ -51,7 +53,7 @@ cat << EOF
     		</form>
           </td>
 	  <td>
-		<form action="/cmd.cgi/">
+		<form action="$cmdurl" method="post">
       			<p><h3>Telnet</h3></p>
 
       			<p><input type="radio"  ${_telneton} name="telnet" value="on" />Включен</p>
@@ -61,7 +63,7 @@ cat << EOF
 
 	  </td>
 	  <td>
-		<form action="/cmd.cgi/">
+		<form action="$cmdurl" method="post">
       			<p><h3>RTSP</h3></p>
 
       			<p><input type="radio"  ${_rtspon} name="rtsp" value="on" />Включен</p>
@@ -75,7 +77,7 @@ cat << EOF
     </table>
 
     <hr />
-    <form action="/cmd.cgi/" accept-charset="utf-8">
+    <form action="$cmdurl" accept-charset="utf-8" method="post">
       <p><h3>Root password</h3></p>
       <p>Изменить пароль пользователя root.</p>
       <p>Доступ по телнет будет возможен только по новому паролю!</p>
@@ -85,7 +87,7 @@ cat << EOF
     </form>
 
     <hr />
-    <form action="/cmd.cgi/" >
+    <form action="$cmdurl" method="post">
       <p><h3>Бэкап разделов камеры.</h3></p>
       <p>Сохранение на карту памяти в папку "backup/${_date}"</p>
       <p>Свободно на карте: ${_dfhd1}${_disableHD1}</p>
