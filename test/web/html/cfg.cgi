@@ -14,7 +14,11 @@ _tz=$((8-carrentTZ))
 [ "$(pidof tcpsvd)" ] && _ftpon="checked" || _ftpoff="checked"
 [ "$(pidof telnetd)" ] && _telneton="checked" || _telnetoff="checked"
 
-if [ -f /home/rtspsvr ]; then
+if [ ! -f /home/rtspsvr ]; then
+    _rtspdisable="disabled"
+fi
+
+if [ -x /home/rtspsvr ]; then
     _rtspon="checked"
 else
     _rtspoff="checked"
@@ -66,9 +70,9 @@ cat << EOF
 		<form action="$cmdurl" method="post">
       			<p><h3>RTSP</h3></p>
 
-      			<p><input type="radio"  ${_rtspon} name="rtsp" value="on" />Включен</p>
-      			<p><input type="radio"  ${_rtspoff} name="rtsp" value="off" />Выключен</p>
-      			<p><button type="submit" name="cmd" value="setrtsp">Изменить</button></p>
+      			<p><input type="radio"  ${_rtspon} name="rtsp" value="on"  ${_rtspdisable}/>Включен</p>
+      			<p><input type="radio"  ${_rtspoff} name="rtsp" value="off"  ${_rtspdisable}/>Выключен</p>
+      			<p><button type="submit" name="cmd" value="setrtsp"  ${_rtspdisable}>Изменить</button></p>
     		</form>
 
 	  </td>

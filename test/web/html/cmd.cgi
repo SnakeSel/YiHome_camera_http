@@ -137,21 +137,16 @@ setRTSP(){
     case "$_rtsp" in
         on )
             echo "Включаем RTSP<br>"
-
-            versionLetter=`sed -n 's/version=\(.......\).*/\1/p' /home/version`
-
-            if [ $versionLetter == '1.8.6.1' ]; then
-                cp $webdir/srv/rtspsvr /home/rtspsvr
-                echo "Для запуска RTSP необходимо перезагрузить камеру.<br>"
-            else
-                echo "<h3>Firmware not supported</h3>"
-            fi
+	    chmod +x /home/rtspsvr && echo "RTSP включен успешно.<br>" || echo "<h3>ОШИБКА включения /home/rtspsvr</h3>"
+            echo "<h3>Для запуска RTSP необходимо перезагрузить камеру.</h3><br>"
 
             #sed -i "s/portRtsp=554/portRtsp=5541/" /etc/ui.conf
         ;;
 
         off )
-            rm -f /home/rtspsvr && echo "RTSP выключен успешно.<br>" || echo "<h3>ОШИБКА удаления /home/rtspsvr</h3>"
+            chmod -x /home/rtspsvr && echo "RTSP выключен успешно.<br>" || echo "<h3>ОШИБКА отключения /home/rtspsvr</h3>"
+            pidof rtspsvr | xargs kill -9
+
             #mv /home/recv_X.726 /home/recv.726
         ;;
 
