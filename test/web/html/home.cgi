@@ -38,6 +38,7 @@ _port=$(netstat -tualnp)
 # HTML страница
 ########################################
 cat header
+
 cat << EOF
     <h2>Общая информация</h2>
     <ul>
@@ -53,9 +54,9 @@ cat << EOF
       <li><strong>telnet:</strong> ${_srvtelnet}</li>
       <li><strong>FTP:</strong> ${_srvftp}</li>
     </ul>
-      
+
     <h2>Ресурсы</h2>
-    <table>
+    <table border="1" cellpadding="2">
       <thead>
         <tr>
           <th scope="col">Диск</th>

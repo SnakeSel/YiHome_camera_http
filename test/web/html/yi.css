@@ -4,9 +4,9 @@ footer, nav, header, section, aside {
 
   }
 
-table, td, th{ 
-    border: 1px solid gray;
-    }
+#table, td, th{ 
+#    border: 1px solid gray;
+#    }
 
 .tablenone{ 
     border: 0px;

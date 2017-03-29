@@ -47,7 +47,7 @@ setFTP(){
         on )
             echo "Включаем FTP.<br>"
             echo "Добавляем в автозагрузку<br>"
-            cat > "/etc/S89ftp" << EOL  && echo "/etc/init.d/S89ftp создан успешно.<br>" || echo "<h3>ОШИБКА создания /etc/init.d/S89ftp.</h3>"
+            cat > "/etc/S89ftp" << "EOL"  && echo "/etc/init.d/S89ftp создан успешно.<br>" || echo "<h3>ОШИБКА создания /etc/init.d/S89ftp.</h3>"
 #!/bin/sh
 tcpsvd -vE 0.0.0.0 21 ftpd -w / &
 EOL
@@ -200,11 +200,111 @@ setPASS(){
 }
 
 
-chainaOFF(){
-    echo "$QUERY_STRING"
-    #ps | grep /home/watch_process | grep -v "grep" | awk '{print $1}' | xargs kill -9
-    #ps | grep /home/cloud | grep -v "grep" | awk '{print $1}' | xargs kill -9
-    #sed -i 's|api.xiaoyi.com/v4/ipc/check_did|api.xiaoyi.cox/v4/ipc/check_did|g' /home/cloud
+chinaOFF(){
+
+    case "$metod" in
+	1 )
+	    echo "<h3>Заменяем url сервера проверки.</h3>"
+	    echo "Создаем бэкап файла /home/cloud<br>"
+	    cp -f /home/cloud /home/cloud_real
+	
+	    echo "Меняем url сервера<br>"
+	    ps | grep /home/watch_process | grep -v "grep" | awk '{print $1}' | xargs kill -9
+	    ps | grep /home/cloud | grep -v "grep" | awk '{print $1}' | xargs kill -9
+	    sed -i 's|api.xiaoyi.com/v4/ipc/check_did|api.xiaoyi.cox/v4/ipc/check_did|g' /home/cloud
+
+	    echo "Создаем файл в init.d для автоотвязки при обновлении.<br>"
+	    cat > "/etc/init.d/S50nochina1" << "EOL"  && echo "/etc/init.d/S50nochina1 создан успешно.<br>" || echo "<h3>ОШИБКА создания /etc/init.d/S50nochina1</h3>"
+#!/bin/sh
+if [ ! -f /home/cloud_real ]; then
+    cp -f /home/cloud /home/cloud_real
+    ps | grep /home/watch_process | grep -v "grep" | awk '{print $1}' | xargs kill -9
+    ps | grep /home/cloud | grep -v "grep" | awk '{print $1}' | xargs kill -9
+    sed -i 's|api.xiaoyi.com/v4/ipc/check_did|api.xiaoyi.cox/v4/ipc/check_did|g' /home/cloud
+    reboot
+fi
+EOL
+	    chmod 755 /etc/init.d/S50nochina1
+	    echo "Отвязка успешно завершена<br>"
+	    echo "Камера будет перезагружена<br>"
+	    sync
+	    reboot
+	;;
+	
+	2 )
+	    echo "<h3>Подменяем ответ сервера проверки</h3>"
+	    echo "Меняем файл API сервера<br>"
+	    ps | grep /home/watch_process | grep -v "grep" | awk '{print $1}' | xargs kill -9
+	    ps | grep /home/cloud | grep -v "grep" | awk '{print $1}' | xargs kill -9
+	    ps | grep /home/cloudAPI | grep -v "grep" | awk '{print $1}' | xargs kill -9
+
+	    echo "Создаем бэкап файла /home/cloudAPI<br>"
+	    mv -f /home/cloudAPI /home/cloudAPI_real
+
+	    cat << "EOL" >"/home/cloudAPI" && echo "/home/cloudAPI создан успешно.<br>" || echo "<h3>ОШИБКА создания /home/cloudAPI</h3>"
+#!/bin/sh
+
+if test "${4#*check_did}" != ${4}
+then
+  echo '{"allow":true,"code":"20000"}'
+else
+  ./cloudAPI_real $@
+fi
+EOL
+	    echo "Создаем файл в init.d для автоотвязки при обновлении.<br>"
+	    cat > "/etc/init.d/S50nochina2" << "EOL"  && echo "/etc/init.d/S50nochina2 создан успешно.<br>" || echo "<h3>ОШИБКА создания /etc/init.d/S50nochina2</h3>"
+#!/bin/sh
+if [ ! -f /home/cloudAPI_real ]; then
+    #/home/app/script/killapp.sh
+    ps | grep /home/watch_process | grep -v "grep" | awk '{print $1}' | xargs kill -9
+    ps | grep /home/cloud | grep -v "grep" | awk '{print $1}' | xargs kill -9
+    ps | grep /home/cloudAPI | grep -v "grep" | awk '{print $1}' | xargs kill -9
+
+    mv -f /home/cloudAPI /home/cloudAPI_real
+    cat >"/home/cloudAPI"<< "EOL2"
+#!/bin/sh
+
+if test "${4#*check_did}" != ${4}
+then
+  echo '{"allow":true,"code":"20000"}'
+else
+  ./cloudAPI_real $@
+fi
+EOL2
+    sync
+    reboot
+fi
+EOL
+	    chmod 755 /etc/init.d/S50nochina2
+	    echo "Отвязка успешно завершена<br>"
+	    echo "Камера будет перезагружена<br>"
+	    sync
+	    reboot
+
+	;;
+	
+	no )
+	    echo "Убираем отвязку от Китая 1<br>"
+	    rm -f /etc/init.d/S50nochina1
+	    ps | grep /home/watch_process | grep -v "grep" | awk '{print $1}' | xargs kill -9
+	    ps | grep /home/cloud | grep -v "grep" | awk '{print $1}' | xargs kill -9
+	    cp -f /home/cloud_real /home/cloud
+
+	    echo "Убираем отвязку от Китая 2<br>"
+	    rm -f /etc/init.d/S50nochina2
+	    ps | grep /home/watch_process | grep -v "grep" | awk '{print $1}' | xargs kill -9
+	    ps | grep /home/cloud | grep -v "grep" | awk '{print $1}' | xargs kill -9
+	    ps | grep /home/cloudAPI | grep -v "grep" | awk '{print $1}' | xargs kill -9
+	    cp -f /home/cloudAPI_real /home/cloudAPI
+
+	    echo "Отвязка успешно удалена<br>"
+	    echo "Для завершения перезагрузите камеру<br>"
+	;;
+	* )
+	    echo "Неверный параметр<br>"
+	    return
+	;;
+    esac
 }
 
 rebootCAM(){
@@ -249,7 +349,7 @@ backupCAM(){
         cat "/dev/mtdblock6" > "/home/hd1/backup/${_date}/mtdblock6"
     fi 
 
-    echo "Резервное копирование завершено."	
+    echo "Резервное копирование завершено."
 }
 
 
@@ -324,6 +424,11 @@ case "$cmd" in
         offCAM
         ;;
 
+    chinaoff )
+	echo "<h2>Отвязка от Китая.</h2><hr />"
+	chinaOFF
+	;;
+	
     backup )
         echo "<h2>Резервное копирование разделов.</h2><hr />"
         backupCAM
