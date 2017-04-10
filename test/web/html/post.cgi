@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # (internal) routine to store POST data
-function cgi_get_POST_vars()
+cgi_get_POST_vars()
 {
     # only handle POST requests here
     [ "$REQUEST_METHOD" != "POST" ] && return
@@ -36,7 +36,7 @@ function cgi_get_POST_vars()
 }
 
 # (internal) routine to decode urlencoded strings
-function cgi_decodevar()
+cgi_decodevar()
 {
     [ $# -ne 1 ] && return
     local v t h
@@ -61,7 +61,7 @@ function cgi_decodevar()
 # usage: cgi_getvars method varname1 [.. varnameN]
 # method is either GET or POST or BOTH
 # the magic varible name ALL gets everything
-function cgi_getvars()
+cgi_getvars()
 {
     [ $# -lt 2 ] && return
     local q p k v s

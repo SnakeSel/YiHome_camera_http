@@ -40,13 +40,20 @@ _port=$(netstat -tualnp)
 cat header
 
 cat << EOF
-    <h2>Общая информация</h2>
-    <ul>
-      <li><strong>Uptime:</strong> ${_uptime}</li>
-      <!-- <li><strong>Kernel: ${_kernel}</strong></li> -->
-      <li><strong>Firmware:</strong> ${_firmware}</li>
-    </ul>
+   <table width="100%" cellpadding="0" cellspacing="10" border="0">
+    <tbody>
+        <tr>
+            <td width="40%">
+	        <h2>Общая информация</h2>
+		<ul>
+    		    <li><strong>Uptime:</strong> ${_uptime}</li>
+    		    <!-- <li><strong>Kernel: ${_kernel}</strong></li> -->
+    		    <li><strong>Firmware:</strong> ${_firmware}</li>
+		</ul>
 
+            </td>
+            <td width="2" bgcolor="#000000"></td>
+            <td>
     <h2>Сервисы</h2>
     <ul>
       <li><strong>lighttpd:</strong> ${_srvlighttpd}</li>
@@ -55,22 +62,9 @@ cat << EOF
       <li><strong>FTP:</strong> ${_srvftp}</li>
     </ul>
 
-    <h2>Ресурсы</h2>
-    <table border="1" cellpadding="2">
-      <thead>
-        <tr>
-          <th scope="col">Диск</th>
-          <th scope="col">ОЗУ</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><pre>${_df}</pre></td>
-          <td><pre>${_free}</pre></td>
-        </tr>
-      </tbody>
-    </table>
-
+            </td>
+            <td width="2" bgcolor="#000000"></td>
+            <td width="40%">
     <h2>Сеть</h2>
     <ul>
       <li><strong>Wi-Fi:</strong> ${_wifi}</li>
@@ -88,6 +82,31 @@ cat << EOF
 	</div> 
       </li>
     </ul>
+
+            </td>
+        </tr>
+    </tbody>
+    </table>
+
+
+
+
+    <h2>Ресурсы</h2>
+    <table border="1" cellpadding="2">
+      <thead>
+        <tr>
+          <th scope="col">Диск</th>
+          <th scope="col">ОЗУ</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><pre>${_df}</pre></td>
+          <td><pre>${_free}</pre></td>
+        </tr>
+      </tbody>
+    </table>
+
 EOF
 cat footer
 

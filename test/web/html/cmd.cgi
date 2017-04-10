@@ -6,9 +6,13 @@ _DEBUG_=
 # Функции
 ########################################
 
+getvar(){
+    echo "$QUERY_STRING" | grep -oE "(^|[?&])$1=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'
+}
 
 setTZ(){
-    #TZ=`echo "$QUERY_STRING" | grep -oE "(^|[?&])tz=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'`
+    tz=$(getvar tz)
+
     if [ ${tz} ]; then
         TZ=$tz
     else
@@ -34,8 +38,7 @@ setTZ(){
 
 
 setFTP(){
-
-    #_ftp=`echo "$QUERY_STRING" | grep -oE "(^|[?&])ftp=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'`
+    ftp=$(getvar ftp)
     if [ ${ftp} ]; then
         _ftp=${ftp}
     else
@@ -84,7 +87,8 @@ EOL
 
 setTELNET(){
 
-    #_telnet=`echo "$QUERY_STRING" | grep -oE "(^|[?&])telnet=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'`
+    telnet=$(getvar telnet)
+
     if [ ${telnet} ]; then
         _telnet=${telnet}
     else
@@ -123,8 +127,8 @@ setTELNET(){
 }
 
 setRTSP(){
-    #_rtsp=`echo "$QUERY_STRING" | grep -oE "(^|[?&])rtsp=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'`
-    
+    rtsp=$(getvar rtsp)
+
     if [ ${rtsp} ]; then
         _rtsp=${rtsp}
     else
@@ -187,20 +191,21 @@ setWIFI(){
 }
 
 setPASS(){
-    #_newpass=`echo "$QUERY_STRING" | grep -oE "(^|[?&])pass=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'`
+    pass=$(getvar pass)
     if [ ${pass} ]; then
         _newpass=${pass}
     else
         echo "Ошибка параметра"
         return
     fi
-    
+
     #echo "$_newpass" | passwd root --stdin
     echo "root:${_newpass}" | chpasswd
 }
 
 
 chinaOFF(){
+    metod=$(getvar metod)
 
     case "$metod" in
 	1 )
@@ -318,10 +323,10 @@ offCAM(){
 backupCAM(){
     _date=$(date +%Y%m%d)
 
-    #mtd3=`echo "$QUERY_STRING" | grep -oE "(^|[?&])mtd3=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'`
-    #mtd4=`echo "$QUERY_STRING" | grep -oE "(^|[?&])mtd4=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'`
-    #mtd5=`echo "$QUERY_STRING" | grep -oE "(^|[?&])mtd5=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'`
-    #mtd6=`echo "$QUERY_STRING" | grep -oE "(^|[?&])mtd6=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'`
+    mtd3=$(getvar mtd3)
+    mtd4=$(getvar mtd4)
+    mtd5=$(getvar mtd5)
+    mtd6=$(getvar mtd6)
 
     mkdir -p "/home/hd1/backup/${_date}" && echo "Директория '/home/hd1/backup/${_date}' успешно создана.<br>" || echo "<h3>ОШИБКА создания директории</h3>"
 
@@ -373,7 +378,8 @@ cat << EOF
 EOF
 
 #cmd=`echo "$QUERY_STRING" | grep -oE "(^|[?&])cmd=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'`
-source ./post.cgi
+#source ./post.cgi
+cmd=$(getvar cmd)
 
 if [ ${_DEBUG_} ]; then
     echo "metod=${REQUEST_METHOD}<br>"
@@ -382,10 +388,10 @@ if [ ${_DEBUG_} ]; then
     echo "cmd=${cmd}<br><hr />"
 fi
 
-if [[ "${REQUEST_METHOD}" = "GET" ]]; then
-    echo "<h3>get больше не поддерживается. Используйте post</h3><br>"
-    exit 0
-fi
+#if [[ "${REQUEST_METHOD}" = "GET" ]]; then
+#    echo "<h3>get больше не поддерживается. Используйте post</h3><br>"
+#    exit 0
+#fi
 
 case "$cmd" in
 

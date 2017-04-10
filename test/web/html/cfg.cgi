@@ -39,7 +39,7 @@ cat << EOF
     <tbody>
         <tr>
             <td>
-                <form action="$cmdurl" method="post">
+                <form action="$cmdurl" method="get">
                     <h3>Часовой пояс</h3>
                     Текущее время:<br>
                     $(date)<br>
@@ -49,7 +49,7 @@ cat << EOF
             </td>
             <td width="2" bgcolor="#000000"></td>
             <td>
-                <form action="$cmdurl" method="post">
+                <form action="$cmdurl" method="get">
                     <h3>Отвязка от китая</h3>
                     Только для китайских версий камеры.<br>
                     Исправляет ошибку "Камера работает только в Китае"<br>
@@ -63,7 +63,7 @@ cat << EOF
             </td>
             <td width="2" bgcolor="#000000"></td>
             <td>
-                <form action="$cmdurl" accept-charset="utf-8" method="post">
+                <form action="$cmdurl" accept-charset="utf-8" method="get">
                     <h3>Изменить пароль пользователя root</h3>
                     Доступ по телнет будет возможен только по новому паролю!<br>
                     В целях избежания ошибок скрипта, используйте только латинские буквы и цифры (без спец символов).
@@ -81,7 +81,7 @@ cat << EOF
     <tbody>
         <tr>
             <td>
-                <form action="$cmdurl" method="post">
+                <form action="$cmdurl" method="get">
                     <p><h3>FTP</h3></p>
                     <p><input type="radio"  $_ftpon name="ftp" value="on" />Включен</p>
                     <p><input type="radio"  $_ftpoff name="ftp" value="off" />Выключен</p>
@@ -89,7 +89,7 @@ cat << EOF
                 </form>
                 </td>
             <td>
-                <form action="$cmdurl" method="post">
+                <form action="$cmdurl" method="get">
                     <p><h3>Telnet</h3></p>
 
                     <p><input type="radio"  ${_telneton} name="telnet" value="on" />Включен</p>
@@ -99,7 +99,7 @@ cat << EOF
 
             </td>
             <td>
-                <form action="$cmdurl" method="post">
+                <form action="$cmdurl" method="get">
                     <p><h3>RTSP</h3></p>
  
                     <p><input type="radio"  ${_rtspon} name="rtsp" value="on"  ${_rtspdisable}/>Включен</p>
@@ -113,7 +113,7 @@ cat << EOF
     </table>
 
     <hr />
-    <form action="$cmdurl" method="post">
+    <form action="$cmdurl" method="get">
       <p><h3>Бэкап разделов камеры.</h3></p>
       <p>Сохранение на карту памяти в папку: "backup/${_date}"</p>
       <p>Свободно на карте: ${_dfhd1}${_disableHD1}</p>
