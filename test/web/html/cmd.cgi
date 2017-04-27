@@ -50,7 +50,7 @@ setFTP(){
         on )
             echo "Включаем FTP.<br>"
             echo "Добавляем в автозагрузку<br>"
-            cat > "/etc/S89ftp" << "EOL"  && echo "/etc/init.d/S89ftp создан успешно.<br>" || echo "<h3>ОШИБКА создания /etc/init.d/S89ftp.</h3>"
+            cat > "/etc/init.d/S89ftp" << "EOL"  && echo "/etc/init.d/S89ftp создан успешно.<br>" || echo "<h3>ОШИБКА создания /etc/init.d/S89ftp.</h3>"
 #!/bin/sh
 tcpsvd -vE 0.0.0.0 21 ftpd -w / &
 EOL
@@ -200,7 +200,7 @@ setPASS(){
     fi
 
     #echo "$_newpass" | passwd root --stdin
-    echo "root:${_newpass}" | chpasswd
+    echo "${_newpass}" | chpasswd
 }
 
 
