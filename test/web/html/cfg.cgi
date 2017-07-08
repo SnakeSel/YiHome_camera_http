@@ -35,48 +35,6 @@ _date=$(date +%Y%m%d)
 ########################################
 cat header
 cat << EOF
-    <table width="100%" cellpadding="0" cellspacing="10" border="0">
-    <tbody>
-        <tr>
-            <td>
-                <form action="$cmdurl" method="get">
-                    <h3>Часовой пояс</h3>
-                    Текущее время:<br>
-                    $(date)<br>
-                    <p><input type=number size=2 maxlength=1 name="tz" value="${_tz}" /></p>
-                    <p><button type="submit" name="cmd" value="settz">Изменить</button></p>
-                </form>
-            </td>
-            <td width="2" bgcolor="#000000"></td>
-            <td>
-                <form action="$cmdurl" method="get">
-                    <h3>Отвязка от китая</h3>
-                    Только для китайских версий камеры.<br>
-                    Исправляет ошибку "Камера работает только в Китае"<br>
-                    <select name="metod">
-                        <option value="1" selected>Замена адреса сервера</option>
-                        <option value="2">Замена кода ответа</option>
-                        <option value="no">Убрать отвязку</option>
-                    </select>
-                    <p><button type="submit" name="cmd" value="chinaoff">Применить</button></p>
-                </form>
-            </td>
-            <td width="2" bgcolor="#000000"></td>
-            <td>
-                <form action="$cmdurl" accept-charset="utf-8" method="get">
-                    <h3>Изменить пароль пользователя root</h3>
-                    Доступ по телнет будет возможен только по новому паролю!<br>
-                    В целях избежания ошибок скрипта, используйте только латинские буквы и цифры (без спец символов).
-                    <p><input type="password"  name="pass" /></p>
-                    <p><button type="submit" name="cmd" value="setpasswd">Изменить</button></p>
-                </form>
-            </td>
-        </tr>
-    </tbody>
-    </table>
-
-    <hr />
-
     <table border="1" cellpadding="4" cellspacing="0" align="center" >
     <tbody>
         <tr>
@@ -113,18 +71,59 @@ cat << EOF
     </table>
 
     <hr />
-    <form action="$cmdurl" method="get">
-      <p><h3>Бэкап разделов камеры.</h3></p>
-      <p>Сохранение на карту памяти в папку: "backup/${_date}"</p>
-      <p>Свободно на карте: ${_dfhd1}${_disableHD1}</p>
-      <p><input type="checkbox"  name="mtd3" ${_disableHD1}/>mtd3 (os)</p>
-      <p><input type="checkbox"  name="mtd4" ${_disableHD1}/>mtd4 (rootfs)</p>
-      <p><input type="checkbox"  name="mtd5" ${_disableHD1}/>mtd5 (home)</p>
-      <p><input type="checkbox"  name="mtd6" ${_disableHD1}/>mtd6 (vd)</p>
-      <p><button type="submit" name="cmd" value="backup" ${_disableHD1}>Сохранить</button></p>
-    </form>
+    <table width="100%" cellpadding="0" cellspacing="10" border="0">
+    <tbody>
+        <tr>
+            <td>
+                <form action="$cmdurl" method="get">
+                    <h3>Часовой пояс</h3>
+                    Текущее время:<br>
+                    $(date)<br>
+                    <p><input type=number size=2 maxlength=1 name="tz" value="${_tz}" /></p>
+                    <p><button type="submit" name="cmd" value="settz">Изменить</button></p>
+                </form>
+            </td>
+            <td width="2" bgcolor="#000000"></td>
+		<td>
+		    <form action="$cmdurl" method="get">
+		      <p><h3>Бэкап разделов камеры.</h3></p>
+		      <p>Сохранение на карту памяти в папку: "backup/${_date}"</p>
+		      <p>Свободно на карте: ${_dfhd1}${_disableHD1}</p>
+		      <p><input type="checkbox"  name="mtd3" ${_disableHD1}/>mtd3 (os)</p>
+		      <p><input type="checkbox"  name="mtd4" ${_disableHD1}/>mtd4 (rootfs)</p>
+		      <p><input type="checkbox"  name="mtd5" ${_disableHD1}/>mtd5 (home)</p>
+		      <p><input type="checkbox"  name="mtd6" ${_disableHD1}/>mtd6 (vd)</p>
+		      <p><button type="submit" name="cmd" value="backup" ${_disableHD1}>Сохранить</button></p>
+		    </form>
 
-    <br>
+		</td>
+         <!--   <td>
+                <form action="$cmdurl" method="get">
+                    <h3>Отвязка от китая</h3>
+                    Только для китайских версий камеры.<br>
+                    Исправляет ошибку "Камера работает только в Китае"<br>
+                    <select name="metod">
+                        <option value="1" selected>Замена адреса сервера</option>
+                        <option value="2">Замена кода ответа</option>
+                        <option value="no">Убрать отвязку</option>
+                    </select>
+                    <p><button type="submit" name="cmd" value="chinaoff">Применить</button></p>
+                </form>
+            </td>
+            <td width="2" bgcolor="#000000"></td>
+            <td>
+                <form action="$cmdurl" accept-charset="utf-8" method="get">
+                    <h3>Изменить пароль пользователя root</h3>
+                    Доступ по телнет будет возможен только по новому паролю!<br>
+                    В целях избежания ошибок скрипта, используйте только латинские буквы и цифры (без спец символов).
+                    <p><input type="password"  name="pass" /></p>
+                    <p><button type="submit" name="cmd" value="setpasswd">Изменить</button></p>
+                </form>
+            </td> -->
+        </tr>
+    </tbody>
+    </table>
+
 EOF
 cat footer
 
