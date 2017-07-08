@@ -142,7 +142,10 @@ setRTSP(){
         on )
             echo "Включаем RTSP<br>"
 	    chmod +x /home/rtspsvr && echo "RTSP включен успешно.<br>" || echo "<h3>ОШИБКА включения /home/rtspsvr</h3>"
-            echo "<h3>Для запуска RTSP необходимо перезагрузить камеру.</h3><br>"
+            #echo "<h3>Для запуска RTSP необходимо перезагрузить камеру.</h3><br>"
+            echo "Запускаем RTSP<br>"
+            /home/rtspsvr &
+            echo "RTSP запущен успешно.<br>"
 
             #sed -i "s/portRtsp=554/portRtsp=5541/" /etc/ui.conf
         ;;
