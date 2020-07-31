@@ -7,7 +7,9 @@
 cmdurl=/cmd.cgi/
 
 # Подсчет TZ
-carrentTZ=$(cat /etc/TZ | sed 's/GMT//')
+#carrentTZ=$(cat /etc/TZ | sed 's/GMT//')
+tzfile=$(cat /etc/TZ)
+carrentTZ=${tzfile//[^0-9+-]/}
 _tz=$((8-carrentTZ))
 
 # Services
