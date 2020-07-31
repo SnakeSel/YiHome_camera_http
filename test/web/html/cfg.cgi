@@ -10,7 +10,15 @@ cmdurl=/cmd.cgi/
 #carrentTZ=$(cat /etc/TZ | sed 's/GMT//')
 tzfile=$(cat /etc/TZ)
 carrentTZ=${tzfile//[^0-9+-]/}
-_tz=$((8-carrentTZ))
+# Если cloud исполняемый, тогда время GMT8-
+if [ -x /home/cloud ]; then
+    _tz=$((8-carrentTZ))
+else
+    _tz=$carrentTZ
+fi
+
+# На всякий еще раз оставляем только цифры и + -
+#_tz=${_tz//[^0-9+-]/}
 
 # Services
 [ "$(pidof tcpsvd)" ] && _ftpon="checked" || _ftpoff="checked"
@@ -24,6 +32,12 @@ if [ -x /home/rtspsvr ]; then
     _rtspon="checked"
 else
     _rtspoff="checked"
+fi
+
+if [ -x /home/cloud ]; then
+    _cloudon="checked"
+else
+    _cloudoff="checked"
 fi
 
 # Backup
@@ -68,6 +82,17 @@ cat << EOF
                 </form>
 
             </td>
+            <td>
+                <form action="$cmdurl" method="get">
+                    <p><h3>Китайские<br>сервисы</h3></p>
+ 
+                    <p><input type="radio"  ${_cloudon} name="cloud" value="on" />Включен</p>
+                    <p><input type="radio"  ${_cloudoff} name="cloud" value="off" />Выключен</p>
+                    <p><button type="submit" name="cmd" value="setcloud" >Изменить</button></p>
+                </form>
+
+            </td>
+
         </tr>
     </tbody>
     </table>

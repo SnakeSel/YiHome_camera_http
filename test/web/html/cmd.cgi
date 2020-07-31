@@ -1,10 +1,18 @@
 #!/bin/sh
 
-_DEBUG_=
+DEBUG=1
 
 ########################################
 # Функции
 ########################################
+debug(){
+    debugfile="debug.log"
+    if [ $DEBUG -eq 1 ]; then
+        #echo -e $(date +"%Y%m%d %k:%M:%S")
+        echo "$(date +'%Y-%m-%d %H:%M:%S')" "$(basename $0)" "$@" >> "${debugfile}"
+    fi
+
+}
 
 getvar(){
     echo "$QUERY_STRING" | grep -oE "(^|[?&])$1=[^&]+" | sed "s/%20/ /g" | cut -f 2 -d "=" | sed -e 's/  *$//'
@@ -13,33 +21,46 @@ getvar(){
 setTZ(){
     tz=$(getvar tz)
 
-    if [ ${tz} ]; then
-        TZ=$tz
-    else
+    if [ -z $tz ]; then
         echo "Ошибка параметра"
         return
     fi
 
-    echo "Зона UTC $TZ<br>"
+    echo "Зона UTC $tz<br>"
 
-    TZtoSet=$((8-TZ))
+    # Если cloud исполняемый, тогда время GMT8-
+    if [ -x /home/cloud ]; then
+        TZtoSet=$((8-tz))
 
-    if [ $TZtoSet -gt 0 ]; then
-        TZValue="GMT+$TZtoSet"
-        #echo "TZValue=$TZValue"
+        #Если >0 то 
+        if [ $TZtoSet -gt 0 ]; then
+            TZValue="GMT+$TZtoSet"
+            #echo "TZValue=$TZValue"
+        else
+            TZValue="GMT$TZtoSet"
+            #echo "TZValue=$TZValue"
+        fi
     else
-        TZValue="GMT$TZtoSet"
-        #echo "TZValue=$TZValue"
+        #Значит работает ntpd и зона UTC-
+        #Если >0 то 
+        if [ $tz -gt 0 ]; then
+            TZValue="UTC+$tz"
+        else
+            TZValue="UTC$tz"
+        fi
+
     fi
 
-    echo $TZValue > /etc/TZ && echo "Временная зона изменена успешно.<br>" || echo "<h3>ОШИБКА записи временной зоны.</h3>"
+    echo $TZValue > /etc/TZ && echo "Временная зона изменена на $TZValue.<br>" || echo "<h3>ОШИБКА записи временной зоны.</h3>"
 
 }
 
 
 setFTP(){
+    initfile="/etc/init.d/S89ftp"
+
     ftp=$(getvar ftp)
-    if [ ${ftp} ]; then
+    if [ "${ftp}" ]; then
         _ftp=${ftp}
     else
         echo "Ошибка параметра"
@@ -50,32 +71,32 @@ setFTP(){
         on )
             echo "Включаем FTP.<br>"
             echo "Добавляем в автозагрузку<br>"
-            cat > "/etc/init.d/S89ftp" << "EOL"  && echo "/etc/init.d/S89ftp создан успешно.<br>" || echo "<h3>ОШИБКА создания /etc/init.d/S89ftp.</h3>"
+            cat > $initfile << "EOL"  && echo "$initfile создан успешно.<br>" || echo "<h3>ОШИБКА создания $initfile.</h3>"
 #!/bin/sh
 tcpsvd -vE 0.0.0.0 21 ftpd -w / &
 EOL
 
-            echo "Изменяем права файла /etc/init.d/S89ftp<br>"
-            if chmod 755 /etc/init.d/S89ftp; then 
+            echo "Изменяем права файла $initfile<br>"
+            if chmod 755 $initfile; then 
                 echo "Права изменены.<br>";
             else
-                echo "<h3>ОШИБКА изменения прав /etc/init.d/S89ftp</h3>"
+                echo "<h3>ОШИБКА изменения прав $initfile</h3>"
                 return;
             fi
 
             echo "Запускаем FTP.<br>"
-            tcpsvd -vE 0.0.0.0 21 ftpd -w / &
+            sh $initfile &
             echo "FTP включен успешно.<br>"
         ;;
 
         off)
             echo "Выключаем FTP.<br>"
             echo "Убиваем процесс.<br>"
-            #ps | grep /home/watch_process | grep -v "grep" | awk '{print $1}' | xargs kill -9
             killall -9 tcpsvd
+            killall -9 ftpd
             #pidof tcpsvd | xargs kill -9
             echo "Убираем из автозагрузки.<br>"
-            rm -f /etc/init.d/S89ftp && echo "FTP выключен успешно.<br>" || echo "<h3>ОШИБКА удаления /etc/init.d/S89ftp.</h3>"
+            rm -f $initfile && echo "FTP выключен успешно.<br>" || echo "<h3>ОШИБКА удаления $initfile</h3>"
         ;;
 
         * )
@@ -141,7 +162,7 @@ setRTSP(){
     case "$_rtsp" in
         on )
             echo "Включаем RTSP<br>"
-	    chmod +x /home/rtspsvr && echo "RTSP включен успешно.<br>" || echo "<h3>ОШИБКА включения /home/rtspsvr</h3>"
+            chmod +x /home/rtspsvr && echo "RTSP включен успешно.<br>" || echo "<h3>ОШИБКА включения /home/rtspsvr</h3>"
             #echo "<h3>Для запуска RTSP необходимо перезагрузить камеру.</h3><br>"
             echo "Запускаем RTSP<br>"
             /home/rtspsvr &
@@ -360,7 +381,62 @@ backupCAM(){
     echo "Резервное копирование завершено."
 }
 
+cloudchina(){
+    initfile="/etc/init.d/S90ntpd"
+    cloud=$(getvar cloud)
 
+    if [ -z $cloud ]; then
+        echo "Ошибка параметра"
+        return
+    fi
+
+    case "$cloud" in
+        on )
+            echo "Выключаем ntpd<br>"
+            killall -9 ntpd
+            rm -f $initfile
+
+            echo "Измененяем формат таймзоны<br>"
+            tzfile=$(cat /etc/TZ)
+            carrentTZ=${tzfile//[^0-9]/}
+            tztoset=$((8-carrentTZ))
+            TZValue="GMT+$tztoset"
+            echo "$TZValue" > /etc/TZ && echo "Временная зона изменена на $TZValue.<br>" || echo "<h3>ОШИБКА записи временной зоны.</h3>"
+
+            echo "Включаем Китайские сервисы<br>"
+            chmod +x /home/goolink /home/cloud /home/web/mini_httpd
+            /home/cloud &
+            ;;
+
+        off)
+            echo "<h3>Внимание! После этого перестанет работать стандартное мобильное приложение, доступ к камере будет только через telnet/ftp/http/rtsp!</h3>"
+            echo "Выключаем Китайские сервисы<br>"
+            chmod -x /home/goolink /home/cloud /home/web/mini_httpd
+            killall -9 cloud
+            killall -9 goolink
+            killall -9 mini_httpd
+
+            echo "Включаем запуск ntpd<br>"
+            echo "while ! nslookup ru.pool.ntp.org; do sleep 1; done; ntpd -p ru.pool.ntp.org" > $initfile
+            chmod 755 $initfile
+            sh $initfile
+
+            echo "Измененяем формат таймзоны<br>"
+            tzfile=$(cat /etc/TZ)
+            carrentTZ=${tzfile//[^0-9]/}
+            tztoset=$((8-carrentTZ))
+            TZValue="UTC-$tztoset"
+            echo "$TZValue" > /etc/TZ && echo "Временная зона изменена на $TZValue.<br>" || echo "<h3>ОШИБКА записи временной зоны.</h3>"
+
+        ;;
+
+        * )
+            echo "<h3>ERROR! Неверный параметр для TELNET.</h3>"
+        ;;
+
+    esac
+
+}
 
 ########################################
 # Скрипт
@@ -384,7 +460,7 @@ EOF
 #source ./post.cgi
 cmd=$(getvar cmd)
 
-if [ ${_DEBUG_} ]; then
+if [ ${DEBUG} ]; then
     echo "metod=${REQUEST_METHOD}<br>"
     echo "get=$QUERY_STRING<br>"
     echo "post=${QUERY_STRING_POST}<br>"
@@ -402,45 +478,50 @@ case "$cmd" in
         echo "<h2>Установка временной зоны.</h2><hr />"
         setTZ
         ;;
-        
+
     setftp )
         echo "<h2>Изменение работы FTP</h2><hr />"
         setFTP
         ;;
-        
+
     settelnet )
         echo "<h2>Изменение работы Telnet</h2><hr />"
         setTELNET
         ;;
-        
+
     setpasswd )
         echo "<h2>Изменение пароля root</h2><hr />"
         setPASS
         ;;
-        
+
     setrtsp )
         echo "<h2>Изменение работы RTSP</h2><hr />"
         setRTSP
         ;;
-        
+
     reboot )
         echo "<h2>Перезагрузка камеры.</h2><hr />"
         rebootCAM
         ;;
-        
+
     off )
         echo "<h2>Выключение камеры.</h2><hr />"
         offCAM
         ;;
 
     chinaoff )
-	echo "<h2>Отвязка от Китая.</h2><hr />"
-	chinaOFF
-	;;
-	
+        echo "<h2>Отвязка от Китая.</h2><hr />"
+        chinaOFF
+        ;;
+
     backup )
         echo "<h2>Резервное копирование разделов.</h2><hr />"
         backupCAM
+        ;;
+
+    setcloud )
+        echo "<h2>Изменение работы Китайских сервисов</h2><hr />"
+        cloudchina
         ;;
 
     * )
