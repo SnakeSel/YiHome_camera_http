@@ -8,30 +8,32 @@
 
 # Общая
 _uptime=$(uptime)
-#_kernel=$(uname -a)
 #_firmware=$(cat /home/version | grep version -m1)
 _firmware=$(sed -n 's/version=\(........\).*/\1/p' /home/version)
 
+# Сеть
+_wifi=$(grep -m1 "ssid" /etc/wpa_supplicant.conf | sed 's/ssid=//')
+_ip=$(ipaddr | grep ra0 | tail -n 1 | awk '{print $2}' | sed 's/\/24//')
+_port=$(netstat -tualnp)
+
 
 # сервисы
-_srvlighttpd=$([ "$(pidof lighttpd)" ] && echo UP || echo DOWN)
-_srvrtsp=$([ "$(pidof rtspsvr)" ] && echo UP || echo DOWN)
+#_srvrtsp=$([ "$(pidof rtspsvr)" ] && echo UP || echo DOWN)
 _srvtelnet=$([ "$(pidof telnetd)" ] && echo UP || echo DOWN)
 _srvftp=$([ "$(pidof tcpsvd)" ] && echo UP || echo DOWN)
 
-#pgrep lighttpd
-#ps aux | grep lighttpd | grep -v "grep"
+if [ "$(pidof rtspsvr)" ];then
+    _srvrtsp="UP"
+    rtspstream="| <b>stream:</b> <a href="rtsp://${_ip}:554/ch0.h264">HD</a> | <a href="rtsp://${_ip}:554/ch1.h264">SD</a>"
+else
+    _srvrtsp="DOWN"
+    rtspstream=""
+fi
 
 # Ресурсы
 _df=$(df -h | grep -v 'tmpfs')
 _free=$(free)
 #_cpu=$(ps | awk '{s += $3} END {print s "%"}')
-
-
-# Сеть
-_wifi=$(cat /etc/wpa_supplicant.conf | grep ssid -m1 | sed 's/ssid=//')
-_ip=$(ipaddr | grep ra0 | tail -n 1 | awk '{print $2}' | sed 's/\/24//')
-_port=$(netstat -tualnp)
 
 
 ########################################
@@ -44,52 +46,48 @@ cat << EOF
     <tbody>
         <tr>
             <td width="40%">
-	        <h2>Общая информация</h2>
-		<ul>
-    		    <li><strong>Uptime:</strong> ${_uptime}</li>
-    		    <!-- <li><strong>Kernel: ${_kernel}</strong></li> -->
-    		    <li><strong>Firmware:</strong> ${_firmware}</li>
-		</ul>
-
+                <h2>Общая информация</h2>
+                <ul>
+                    <li><strong>Uptime:</strong> ${_uptime}</li>
+                    <li><strong>Firmware:</strong> ${_firmware}</li>
+                </ul>
             </td>
+
             <td width="2" bgcolor="#000000"></td>
+
             <td>
-    <h2>Сервисы</h2>
-    <ul>
-      <li><strong>lighttpd:</strong> ${_srvlighttpd}</li>
-      <li><strong>RTSP:</strong> ${_srvrtsp}</li>
-      <li><strong>telnet:</strong> ${_srvtelnet}</li>
-      <li><strong>FTP:</strong> ${_srvftp}</li>
-    </ul>
-
+                <h2>Сервисы</h2>
+                <ul>
+                  <li><strong>RTSP:    </strong> ${_srvrtsp} $rtspstream</li>
+                  <li><strong>telnet:  </strong> ${_srvtelnet}</li>
+                  <li><strong>FTP:     </strong> ${_srvftp}</li>
+                </ul>
             </td>
+
             <td width="2" bgcolor="#000000"></td>
+
             <td width="40%">
-    <h2>Сеть</h2>
-    <ul>
-      <li><strong>Wi-Fi:</strong> ${_wifi}</li>
-      <li><strong>IP:</strong> ${_ip}</li>
-
-      <li>
-	<div class="spoil"> 
-	  <div class="smallfont"><input type="button" value="Открытые порты" class="input-button" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')[1].getElementsByTagName('div')[0].style.display != '') { this.parentNode.parentNode.getElementsByTagName('div')[1].getElementsByTagName('div')[0].style.display = ''; this.innerText = ''; this.value = 'Свернуть'; } else { this.parentNode.parentNode.getElementsByTagName('div')[1].getElementsByTagName('div')[0].style.display = 'none'; this.innerText = ''; this.value = 'Открытые порты'; }"/> 
-	  </div> 
-	  <div class="alt2"> 
-	    <div style="display: none; text-align:left;"> 
-	      <pre>${_port}</pre>
-	    </div> 
-	  </div> 
-	</div> 
-      </li>
-    </ul>
-
+                <h2>Сеть</h2>
+                <ul>
+                  <li><strong>Wi-Fi:</strong> ${_wifi}</li>
+                  <li><strong>IP:</strong> ${_ip}</li>
+                  <li>
+                    <div class="spoil">
+                      <div class="smallfont"><input type="button" value="Открытые порты" class="input-button" onclick="if (this.parentNode.parentNode.getElementsByTagName('div')[1].getElementsByTagName('div')[0].style.display != '') { this.parentNode.parentNode.getElementsByTagName('div')[1].getElementsByTagName('div')[0].style.display = ''; this.innerText = ''; this.value = 'Свернуть'; } else { this.parentNode.parentNode.getElementsByTagName('div')[1].getElementsByTagName('div')[0].style.display = 'none'; this.innerText = ''; this.value = 'Открытые порты'; }"/>
+                      </div>
+                      <div class="alt2">
+                        <div style="display: none; text-align:left;">
+                        <pre>${_port}</pre>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
             </td>
+
         </tr>
     </tbody>
     </table>
-
-
-
 
     <h2>Ресурсы</h2>
     <table border="1" cellpadding="2">
@@ -106,7 +104,8 @@ cat << EOF
         </tr>
       </tbody>
     </table>
-
+</br>
+</br>
 EOF
 cat footer
 

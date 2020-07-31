@@ -27,7 +27,7 @@
     <hr />
     <nav>
       <a href="/">Начало</a>  |
-      <a href="/video/" target="_blank">Просмотр видео</a> |
+      <a href="/video/" target="_blank">Записи</a> |
       <a href="/cfg.cgi">Настройки</a>
     </nav>
     <hr />
