@@ -27,6 +27,8 @@ versionLetter=`sed -n 's/version=\(.......\).*/\1/p' /home/version`
 case $versionLetter in
     1.8.6.1) file='M'
         ;;
+    1.8.7.0) file='M'
+        ;;
     *) file='None'
         ;;
 esac
